@@ -1,0 +1,10 @@
+**/.DS_Store
+.mypy_cache/
+.venv/
+build/
+cmake-cache/
+ns3.40.egg-info/
+.lock*
+
+.cache/
+*.log
