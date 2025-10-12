@@ -8,3 +8,4 @@ ns3.40.egg-info/
 
 .cache/
 *.log
+**/.idea

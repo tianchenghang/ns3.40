@@ -1,8 +1,11 @@
-# The Network Simulator, Version 3
+```bash
+./ns3 run "rl-tcp --transport_prot=TcpRl"
 
-[![codecov](https://codecov.io/gh/nsnam/ns-3-dev-git/branch/master/graph/badge.svg)](https://codecov.io/gh/nsnam/ns-3-dev-git/branch/master/)
-[![Gitlab CI](https://gitlab.com/nsnam/ns-3-dev/badges/master/pipeline.svg)](https://gitlab.com/nsnam/ns-3-dev/-/pipelines)
-[![Github CI](https://github.com/nsnam/ns-3-dev-git/actions/workflows/per_commit.yml/badge.svg)](https://github.com/nsnam/ns-3-dev-git/actions)
+cd ./contrib/opengym
+python ./examples/rl-tcp/test_tcp.py --start=0 &> ./test_tcp.log
+```
+
+# The Network Simulator, Version 3
 
 ## Table of Contents
 

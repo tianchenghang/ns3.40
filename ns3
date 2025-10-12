@@ -1,4 +1,4 @@
-#! ./contrib/opengym/.venv/bin/python3.9
+#! ./.venv/bin/python3.9
 
 import argparse
 import atexit
