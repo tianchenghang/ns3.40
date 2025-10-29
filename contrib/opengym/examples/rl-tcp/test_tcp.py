@@ -82,11 +82,12 @@ try:
         while True:
             stepIdx += 1
             action = tcpAgent.get_action(obs, reward, done, info)
-            print("---action: ", action)
 
-            print("Step: ", stepIdx)
             obs, reward, done, info = env.step(action)
-            print("---obs, reward, done, info: ", obs, reward, done, info)
+            if info != 'IncreaseWindow':
+                print("---action: ", action)
+                print("Step: ", stepIdx)
+                print("---obs, reward, done, info: ", obs, reward, done, info)
 
             # get existing agent of create new TCP agent if needed
             tcpAgent = get_agent(obs)

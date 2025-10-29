@@ -11,8 +11,10 @@ conda activate ./.venv
 ./ns3 configure --enable-examples
 ./ns3 build
 
+pip3 install --user ./contrib/opengym/model/ns3gym
+
 ./ns3 run "rl-tcp --transport_prot=TcpRl"
-python ./contrib/opengymexamples/rl-tcp/test_tcp.py --start=0 &> ./rl-tcp.log
+python ./contrib/opengym/examples/rl-tcp/test_tcp.py --start=0 &> ./rl-tcp.log
 ```
 
 # The Network Simulator, Version 3
