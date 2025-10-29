@@ -1,8 +1,18 @@
-```bash
-./ns3 run "rl-tcp --transport_prot=TcpRl"
+# lark
 
-cd ./contrib/opengym
-python ./examples/rl-tcp/test_tcp.py --start=0 &> ./test_tcp.log
+```bash
+sudo apt update && sudo apt full-upgrade
+sudo apt install libzmq5 libzmq3-dev libprotobuf-dev protobuf-compiler
+sudo apt autoclean && sudo apt autoremove
+
+conda create -p ./.venv python=3.13
+conda activate ./.venv
+
+./ns3 configure --enable-examples
+./ns3 build
+
+./ns3 run "rl-tcp --transport_prot=TcpRl"
+python ./contrib/opengymexamples/rl-tcp/test_tcp.py --start=0 &> ./rl-tcp.log
 ```
 
 # The Network Simulator, Version 3
