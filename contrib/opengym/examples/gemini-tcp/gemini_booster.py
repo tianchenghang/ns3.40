@@ -14,6 +14,7 @@ import threading
 from collections import deque
 import logging
 
+
 class GeminiBooster:
     """
     Booster: Online optimization engine for Gemini congestion control
@@ -23,25 +24,25 @@ class GeminiBooster:
     def __init__(self, config_file: str = None):
         # Default configuration
         self.config = {
-            'parameter_bounds': {
-                'alpha': (1.0, 3.0),
-                'gamma': (1.0, 6.0),
-                'lambda': (0.5, 0.95),
-                'loss_thresh': (0.001, 0.05),
-                'rtt_thresh': (0.1, 0.8),
-                'window_size': (1, 10)
+            "parameter_bounds": {
+                "alpha": (1.0, 3.0),
+                "gamma": (1.0, 6.0),
+                "lambda": (0.5, 0.95),
+                "loss_thresh": (0.001, 0.05),
+                "rtt_thresh": (0.1, 0.8),
+                "window_size": (1, 10),
             },
-            'hidden_variables': ['region', 'isp', 'time_of_day'],
-            'optimization': {
-                'acquisition_function': 'ei',  # Expected Improvement
-                'exploration_weight': 0.1,
-                'max_iterations': 100,
-                'convergence_threshold': 0.01
+            "hidden_variables": ["region", "isp", "time_of_day"],
+            "optimization": {
+                "acquisition_function": "ei",  # Expected Improvement
+                "exploration_weight": 0.1,
+                "max_iterations": 100,
+                "convergence_threshold": 0.01,
             },
-            'performance': {
-                'utility_function': 'throughput - 0.1 * delay',
-                'sigma': 0.1
-            }
+            "performance": {
+                "utility_function": "throughput - 0.1 * delay",
+                "sigma": 0.1,
+            },
         }
 
         if config_file:
@@ -55,8 +56,8 @@ class GeminiBooster:
         self.is_trained = False
 
         # Hidden variable mappings
-        self.region_map = {'east': 0, 'west': 1, 'north': 2, 'south': 3}
-        self.isp_map = {'telecom': 0, 'unicom': 1, 'mobile': 2}
+        self.region_map = {"east": 0, "west": 1, "north": 2, "south": 3}
+        self.isp_map = {"telecom": 0, "unicom": 1, "mobile": 2}
 
         # Thread safety
         self.lock = threading.Lock()
@@ -70,18 +71,18 @@ class GeminiBooster:
         """Setup logging configuration"""
         logging.basicConfig(
             level=logging.INFO,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
             handlers=[
-                logging.FileHandler('gemini_booster.log'),
-                logging.StreamHandler()
-            ]
+                logging.FileHandler("gemini_booster.log"),
+                logging.StreamHandler(),
+            ],
         )
-        self.logger = logging.getLogger('GeminiBooster')
+        self.logger = logging.getLogger("GeminiBooster")
 
     def load_config(self, config_file: str):
         """Load configuration from JSON file"""
         try:
-            with open(config_file, 'r') as f:
+            with open(config_file, "r") as f:
                 user_config = json.load(f)
 
             # Deep merge configurations
@@ -101,18 +102,18 @@ class GeminiBooster:
 
         # Region (one-hot encoding)
         region_encoded = [0] * len(self.region_map)
-        if hidden_vars.get('region') in self.region_map:
-            region_encoded[self.region_map[hidden_vars['region']]] = 1
+        if hidden_vars.get("region") in self.region_map:
+            region_encoded[self.region_map[hidden_vars["region"]]] = 1
         encoded.extend(region_encoded)
 
         # ISP (one-hot encoding)
         isp_encoded = [0] * len(self.isp_map)
-        if hidden_vars.get('isp') in self.isp_map:
-            isp_encoded[self.isp_map[hidden_vars['isp']]] = 1
+        if hidden_vars.get("isp") in self.isp_map:
+            isp_encoded[self.isp_map[hidden_vars["isp"]]] = 1
         encoded.extend(isp_encoded)
 
         # Time of day (cyclic encoding)
-        time_of_day = hidden_vars.get('time_of_day', 12)
+        time_of_day = hidden_vars.get("time_of_day", 12)
         encoded.append(np.sin(2 * np.pi * time_of_day / 24))
         encoded.append(np.cos(2 * np.pi * time_of_day / 24))
 
@@ -120,17 +121,17 @@ class GeminiBooster:
 
     def calculate_utility(self, performance: Dict) -> float:
         """Calculate utility function from performance metrics"""
-        throughput = performance.get('throughput', 0)
-        delay = performance.get('delay', 0)  # in ms
-        loss_rate = performance.get('loss_rate', 0)
+        throughput = performance.get("throughput", 0)
+        delay = performance.get("delay", 0)  # in ms
+        loss_rate = performance.get("loss_rate", 0)
 
         # Basic utility: throughput - σ * delay
-        sigma = self.config['performance']['sigma']
+        sigma = self.config["performance"]["sigma"]
         utility = throughput - sigma * delay
 
         # Penalize high loss rates
         if loss_rate > 0.1:  # 10% threshold
-            utility *= (1 - loss_rate)
+            utility *= 1 - loss_rate
 
         return utility
 
@@ -139,12 +140,12 @@ class GeminiBooster:
         with self.lock:
             # Encode features
             param_vector = [
-                parameters['alpha'],
-                parameters['gamma'],
-                parameters['lambda'],
-                parameters['loss_thresh'],
-                parameters['rtt_thresh'],
-                parameters['window_size']
+                parameters["alpha"],
+                parameters["gamma"],
+                parameters["lambda"],
+                parameters["loss_thresh"],
+                parameters["rtt_thresh"],
+                parameters["window_size"],
             ]
 
             hidden_vector = self.encode_hidden_variables(hidden_vars)
@@ -155,12 +156,12 @@ class GeminiBooster:
 
             # Store sample
             sample = {
-                'timestamp': datetime.now(),
-                'features': feature_vector,
-                'parameters': parameters.copy(),
-                'hidden_vars': hidden_vars.copy(),
-                'performance': performance.copy(),
-                'utility': utility
+                "timestamp": datetime.now(),
+                "features": feature_vector,
+                "parameters": parameters.copy(),
+                "hidden_vars": hidden_vars.copy(),
+                "performance": performance.copy(),
+                "utility": utility,
             }
 
             self.history.append(sample)
@@ -183,8 +184,8 @@ class GeminiBooster:
                 utilities = []
 
                 for sample in self.history:
-                    features.append(sample['features'])
-                    utilities.append(sample['utility'])
+                    features.append(sample["features"])
+                    utilities.append(sample["utility"])
 
                 X = np.array(features)
                 y = np.array(utilities).reshape(-1, 1)
@@ -198,9 +199,7 @@ class GeminiBooster:
 
                 # Create and train GP model
                 self.surrogate_model = GaussianProcessRegressor(
-                    kernel=kernel,
-                    n_restarts_optimizer=10,
-                    alpha=1e-2
+                    kernel=kernel, n_restarts_optimizer=10, alpha=1e-2
                 )
 
                 self.surrogate_model.fit(X_scaled, y_scaled.ravel())
@@ -223,10 +222,10 @@ class GeminiBooster:
             y_pred = self.scaler_y.inverse_transform(y_pred.reshape(-1, 1)).flatten()
 
             # Find best current utility
-            best_utility = max(sample['utility'] for sample in self.history)
+            best_utility = max(sample["utility"] for sample in self.history)
 
             # Calculate improvement
-            with np.errstate(divide='warn'):
+            with np.errstate(divide="warn"):
                 imp = y_pred - best_utility - xi
                 Z = imp / sigma
                 ei = imp * self._norm_cdf(Z) + sigma * self._norm_pdf(Z)
@@ -269,12 +268,12 @@ class GeminiBooster:
 
         # Convert back to parameter dictionary
         best_params = {
-            'alpha': best_candidate[0],
-            'gamma': best_candidate[1],
-            'lambda': best_candidate[2],
-            'loss_thresh': best_candidate[3],
-            'rtt_thresh': best_candidate[4],
-            'window_size': int(round(best_candidate[5]))
+            "alpha": best_candidate[0],
+            "gamma": best_candidate[1],
+            "lambda": best_candidate[2],
+            "loss_thresh": best_candidate[3],
+            "rtt_thresh": best_candidate[4],
+            "window_size": int(round(best_candidate[5])),
         }
 
         self.logger.info(f"Optimized parameters: {best_params}")
@@ -282,7 +281,7 @@ class GeminiBooster:
 
     def _generate_candidates(self, n_candidates: int, hidden_vars: Dict) -> np.ndarray:
         """Generate candidate parameter vectors"""
-        bounds = self.config['parameter_bounds']
+        bounds = self.config["parameter_bounds"]
         hidden_encoded = self.encode_hidden_variables(hidden_vars)
 
         candidates = []
@@ -290,12 +289,12 @@ class GeminiBooster:
         for _ in range(n_candidates):
             # Random parameters within bounds
             params = [
-                np.random.uniform(bounds['alpha'][0], bounds['alpha'][1]),
-                np.random.uniform(bounds['gamma'][0], bounds['gamma'][1]),
-                np.random.uniform(bounds['lambda'][0], bounds['lambda'][1]),
-                np.random.uniform(bounds['loss_thresh'][0], bounds['loss_thresh'][1]),
-                np.random.uniform(bounds['rtt_thresh'][0], bounds['rtt_thresh'][1]),
-                np.random.uniform(bounds['window_size'][0], bounds['window_size'][1])
+                np.random.uniform(bounds["alpha"][0], bounds["alpha"][1]),
+                np.random.uniform(bounds["gamma"][0], bounds["gamma"][1]),
+                np.random.uniform(bounds["lambda"][0], bounds["lambda"][1]),
+                np.random.uniform(bounds["loss_thresh"][0], bounds["loss_thresh"][1]),
+                np.random.uniform(bounds["rtt_thresh"][0], bounds["rtt_thresh"][1]),
+                np.random.uniform(bounds["window_size"][0], bounds["window_size"][1]),
             ]
 
             # Combine with hidden variables
@@ -306,15 +305,15 @@ class GeminiBooster:
 
     def get_default_parameters(self) -> Dict:
         """Get default Gemini parameters"""
-        bounds = self.config['parameter_bounds']
+        bounds = self.config["parameter_bounds"]
 
         return {
-            'alpha': np.mean(bounds['alpha']),
-            'gamma': np.mean(bounds['gamma']),
-            'lambda': np.mean(bounds['lambda']),
-            'loss_thresh': np.mean(bounds['loss_thresh']),
-            'rtt_thresh': np.mean(bounds['rtt_thresh']),
-            'window_size': int(np.mean(bounds['window_size']))
+            "alpha": np.mean(bounds["alpha"]),
+            "gamma": np.mean(bounds["gamma"]),
+            "lambda": np.mean(bounds["lambda"]),
+            "loss_thresh": np.mean(bounds["loss_thresh"]),
+            "rtt_thresh": np.mean(bounds["rtt_thresh"]),
+            "window_size": int(np.mean(bounds["window_size"])),
         }
 
     def get_performance_stats(self) -> Dict:
@@ -322,17 +321,17 @@ class GeminiBooster:
         if not self.history:
             return {}
 
-        utilities = [sample['utility'] for sample in self.history]
-        throughputs = [sample['performance']['throughput'] for sample in self.history]
-        delays = [sample['performance']['delay'] for sample in self.history]
+        utilities = [sample["utility"] for sample in self.history]
+        throughputs = [sample["performance"]["throughput"] for sample in self.history]
+        delays = [sample["performance"]["delay"] for sample in self.history]
 
         return {
-            'samples_count': len(self.history),
-            'avg_utility': np.mean(utilities),
-            'std_utility': np.std(utilities),
-            'avg_throughput': np.mean(throughputs),
-            'avg_delay': np.mean(delays),
-            'best_utility': max(utilities) if utilities else 0
+            "samples_count": len(self.history),
+            "avg_utility": np.mean(utilities),
+            "std_utility": np.std(utilities),
+            "avg_throughput": np.mean(throughputs),
+            "avg_delay": np.mean(delays),
+            "best_utility": max(utilities) if utilities else 0,
         }
 
     def save_model(self, filepath: str):
@@ -343,11 +342,11 @@ class GeminiBooster:
 
         try:
             model_data = {
-                'surrogate_model': self.surrogate_model,
-                'scaler_x': self.scaler_x,
-                'scaler_y': self.scaler_y,
-                'history': list(self.history),
-                'config': self.config
+                "surrogate_model": self.surrogate_model,
+                "scaler_x": self.scaler_x,
+                "scaler_y": self.scaler_y,
+                "history": list(self.history),
+                "config": self.config,
             }
 
             joblib.dump(model_data, filepath)
@@ -361,17 +360,18 @@ class GeminiBooster:
         try:
             model_data = joblib.load(filepath)
 
-            self.surrogate_model = model_data['surrogate_model']
-            self.scaler_x = model_data['scaler_x']
-            self.scaler_y = model_data['scaler_y']
-            self.history = deque(model_data['history'], maxlen=1000)
-            self.config = model_data['config']
+            self.surrogate_model = model_data["surrogate_model"]
+            self.scaler_x = model_data["scaler_x"]
+            self.scaler_y = model_data["scaler_y"]
+            self.history = deque(model_data["history"], maxlen=1000)
+            self.config = model_data["config"]
             self.is_trained = True
 
             self.logger.info(f"Model loaded from {filepath}")
 
         except Exception as e:
             self.logger.error(f"Failed to load model: {e}")
+
 
 class GeminiAgent:
     """
@@ -385,24 +385,21 @@ class GeminiAgent:
         self.performance_history = []
 
         # Hidden variables for this agent
-        self.hidden_vars = {
-            'region': 'east',
-            'isp': 'telecom',
-            'time_of_day': 12
-        }
+        self.hidden_vars = {"region": "east", "isp": "telecom", "time_of_day": 12}
 
-        self.logger = logging.getLogger(f'GeminiAgent_{agent_id}')
+        self.logger = logging.getLogger(f"GeminiAgent_{agent_id}")
         self.logger.info(f"Gemini Agent {agent_id} initialized")
 
-    def update_hidden_variables(self, region: str = None, isp: str = None,
-                              time_of_day: int = None):
+    def update_hidden_variables(
+        self, region: str = None, isp: str = None, time_of_day: int = None
+    ):
         """Update hidden variables for this agent"""
         if region:
-            self.hidden_vars['region'] = region
+            self.hidden_vars["region"] = region
         if isp:
-            self.hidden_vars['isp'] = isp
+            self.hidden_vars["isp"] = isp
         if time_of_day is not None:
-            self.hidden_vars['time_of_day'] = time_of_day % 24
+            self.hidden_vars["time_of_day"] = time_of_day % 24
 
     def report_performance(self, performance_metrics: Dict):
         """Report performance metrics to Booster"""
@@ -411,16 +408,18 @@ class GeminiAgent:
             self.booster.add_sample(
                 parameters=self.current_parameters,
                 hidden_vars=self.hidden_vars,
-                performance=performance_metrics
+                performance=performance_metrics,
             )
 
             # Store in local history
-            self.performance_history.append({
-                'timestamp': datetime.now(),
-                'parameters': self.current_parameters.copy(),
-                'performance': performance_metrics.copy(),
-                'utility': self.booster.calculate_utility(performance_metrics)
-            })
+            self.performance_history.append(
+                {
+                    "timestamp": datetime.now(),
+                    "parameters": self.current_parameters.copy(),
+                    "performance": performance_metrics.copy(),
+                    "utility": self.booster.calculate_utility(performance_metrics),
+                }
+            )
 
             self.logger.debug(f"Performance reported: {performance_metrics}")
 
@@ -447,19 +446,20 @@ class GeminiAgent:
 
         recent_history = self.performance_history[-50:]  # Last 50 samples
 
-        throughputs = [p['performance']['throughput'] for p in recent_history]
-        delays = [p['performance']['delay'] for p in recent_history]
-        utilities = [p['utility'] for p in recent_history]
+        throughputs = [p["performance"]["throughput"] for p in recent_history]
+        delays = [p["performance"]["delay"] for p in recent_history]
+        utilities = [p["utility"] for p in recent_history]
 
         return {
-            'agent_id': self.agent_id,
-            'samples_count': len(recent_history),
-            'avg_throughput': np.mean(throughputs),
-            'avg_delay': np.mean(delays),
-            'avg_utility': np.mean(utilities),
-            'current_parameters': self.current_parameters,
-            'hidden_vars': self.hidden_vars
+            "agent_id": self.agent_id,
+            "samples_count": len(recent_history),
+            "avg_throughput": np.mean(throughputs),
+            "avg_delay": np.mean(delays),
+            "avg_utility": np.mean(utilities),
+            "current_parameters": self.current_parameters,
+            "hidden_vars": self.hidden_vars,
         }
+
 
 # Example usage and testing
 def demo_gemini_booster():
@@ -470,15 +470,15 @@ def demo_gemini_booster():
 
     # Create multiple agents for different network conditions
     agents = {
-        'east_telecom': GeminiAgent(booster, 'east_telecom'),
-        'west_unicom': GeminiAgent(booster, 'west_unicom'),
-        'north_mobile': GeminiAgent(booster, 'north_mobile')
+        "east_telecom": GeminiAgent(booster, "east_telecom"),
+        "west_unicom": GeminiAgent(booster, "west_unicom"),
+        "north_mobile": GeminiAgent(booster, "north_mobile"),
     }
 
     # Set different hidden variables for each agent
-    agents['east_telecom'].update_hidden_variables('east', 'telecom', 9)
-    agents['west_unicom'].update_hidden_variables('west', 'unicom', 14)
-    agents['north_mobile'].update_hidden_variables('north', 'mobile', 20)
+    agents["east_telecom"].update_hidden_variables("east", "telecom", 9)
+    agents["west_unicom"].update_hidden_variables("west", "unicom", 14)
+    agents["north_mobile"].update_hidden_variables("north", "mobile", 20)
 
     # Simulate performance reporting and optimization
     print("Starting Gemini Booster demonstration...")
@@ -489,9 +489,9 @@ def demo_gemini_booster():
         for agent_name, agent in agents.items():
             # Simulate performance metrics (in real scenario, these come from ns-3)
             performance = {
-                'throughput': np.random.uniform(10, 100),
-                'delay': np.random.uniform(10, 100),
-                'loss_rate': np.random.uniform(0, 0.05)
+                "throughput": np.random.uniform(10, 100),
+                "delay": np.random.uniform(10, 100),
+                "loss_rate": np.random.uniform(0, 0.05),
             }
 
             # Report performance
@@ -504,8 +504,10 @@ def demo_gemini_booster():
 
             # Print performance summary
             summary = agent.get_performance_summary()
-            print(f"{agent_name}: Avg throughput={summary['avg_throughput']:.2f}Mbps, "
-                  f"delay={summary['avg_delay']:.2f}ms, utility={summary['avg_utility']:.2f}")
+            print(
+                f"{agent_name}: Avg throughput={summary['avg_throughput']:.2f}Mbps, "
+                f"delay={summary['avg_delay']:.2f}ms, utility={summary['avg_utility']:.2f}"
+            )
 
     # Print overall booster statistics
     booster_stats = booster.get_performance_stats()
@@ -515,7 +517,8 @@ def demo_gemini_booster():
     print(f"Best utility: {booster_stats['best_utility']:.2f}")
 
     # Save model
-    booster.save_model('gemini_booster_model.pkl')
+    booster.save_model("gemini_booster_model.pkl")
+
 
 if __name__ == "__main__":
     demo_gemini_booster()

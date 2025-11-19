@@ -166,8 +166,7 @@ TcpGemini::GetSsThresh(Ptr<const TcpSocketState> tcb, uint32_t bytesInFlight)
     uint32_t newWindow = static_cast<uint32_t>(tcb->m_cWnd * m_lambda);
     newWindow = std::max(newWindow, 2 * tcb->m_segmentSize);
 
-    // EnterRecovery(const_cast<Ptr<TcpSocketState>>(tcb));
-    EnterRecovery(tcb);
+    EnterRecovery();
 
     NS_LOG_INFO("Multiplicative decrease: cWnd from " << tcb->m_cWnd << " to " << newWindow);
     return newWindow;
@@ -199,7 +198,7 @@ TcpGemini::PktsAcked(Ptr<TcpSocketState> tcb, uint32_t segmentsAcked, const Time
     // Check for congestion signals
     if (CheckCongestionSignal())
     {
-        EnterRecovery(tcb);
+        EnterRecovery();
     }
 
     // Update throughput measurement
@@ -315,7 +314,7 @@ TcpGemini::EnterCongestionAvoidance(Ptr<TcpSocketState> tcb)
 }
 
 void
-TcpGemini::EnterRecovery(Ptr<TcpSocketState> tcb)
+TcpGemini::EnterRecovery()
 {
     m_inRecovery = true;
     m_inSlowStart = false;

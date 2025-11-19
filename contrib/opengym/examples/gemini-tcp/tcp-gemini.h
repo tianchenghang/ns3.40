@@ -17,28 +17,27 @@ class TcpGemini : public TcpCongestionOps
 {
   public:
     static TypeId GetTypeId(void);
-
     TcpGemini(void);
     TcpGemini(const TcpGemini& sock);
-    virtual ~TcpGemini(void);
+    ~TcpGemini(void) override;
 
-    virtual std::string GetName() const;
+    std::string GetName() const override;
+    Ptr<TcpCongestionOps> Fork() override;
 
-    virtual void IncreaseWindow(Ptr<TcpSocketState> tcb, uint32_t segmentsAcked);
-    virtual uint32_t GetSsThresh(Ptr<const TcpSocketState> tcb, uint32_t bytesInFlight);
-    virtual void PktsAcked(Ptr<TcpSocketState> tcb, uint32_t segmentsAcked, const Time& rtt);
-    virtual void CongestionStateSet(Ptr<TcpSocketState> tcb,
-                                    const TcpSocketState::TcpCongState_t newState);
-
-    virtual Ptr<TcpCongestionOps> Fork();
-
-    // Gemini specific methods
     void SetParameters(double alpha,
                        double gamma,
                        double lambda,
                        double lossThresh,
                        double rttThresh,
                        uint32_t windowSize);
+
+    void IncreaseWindow(Ptr<TcpSocketState> tcb, uint32_t segmentsAcked) override;
+    uint32_t GetSsThresh(Ptr<const TcpSocketState> tcb, uint32_t bytesInFlight) override;
+    void PktsAcked(Ptr<TcpSocketState> tcb, uint32_t segmentsAcked, const Time& rtt) override;
+    void CongestionStateSet(Ptr<TcpSocketState> tcb,
+                            const TcpSocketState::TcpCongState_t newState) override;
+
+    // Gemini specific methods
     void GetCurrentStats(double& throughput, double& delay, double& lossRate);
 
   private:
@@ -74,7 +73,7 @@ class TcpGemini : public TcpCongestionOps
     void MeasurementTimeout(void);
     void EnterSlowStart(Ptr<TcpSocketState> tcb);
     void EnterCongestionAvoidance(Ptr<TcpSocketState> tcb);
-    void EnterRecovery(Ptr<TcpSocketState> tcb);
+    void EnterRecovery(void);
 };
 
 } // namespace ns3

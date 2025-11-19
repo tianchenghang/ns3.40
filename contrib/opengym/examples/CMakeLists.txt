@@ -63,3 +63,18 @@ build_lib_example(
     ${libpoint-to-point-layout}
     ${libptp}
 )
+
+build_lib_example(
+  NAME gemini-tcp
+  SOURCE_FILES gemini-tcp/sim.cc
+               gemini-tcp/tcp-gemini-env.cc
+               gemini-tcp/tcp-gemini.cc
+  LIBRARIES_TO_LINK
+    ${libapplications}
+    ${libcore}
+    ${libflow-monitor}
+    ${libinternet}
+    ${libopengym}
+    ${libpoint-to-point-layout}
+    ${libptp}
+)
